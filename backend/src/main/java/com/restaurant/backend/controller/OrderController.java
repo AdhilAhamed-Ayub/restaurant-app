@@ -59,9 +59,21 @@ public class OrderController {
         return ResponseEntity.ok(savedOrder);
     }
 
-    // Get all orders (for Admin Dashboard later)
+    // Get all orders (for Staff/Admin Dashboard)
     @GetMapping
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    // Update order status
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Order> updateStatus(@PathVariable Long id, @RequestParam String status) {
+        Optional<Order> orderOpt = orderRepository.findById(id);
+        if (orderOpt.isPresent()) {
+            Order order = orderOpt.get();
+            order.setStatus(status);
+            return ResponseEntity.ok(orderRepository.save(order));
+        }
+        return ResponseEntity.notFound().build();
     }
 }

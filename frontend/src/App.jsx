@@ -2,15 +2,18 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import LandingPage from './LandingPage';
 import MenuPage from './MenuPage';
+import AdminMenuAdd from './AdminMenuAdd';
+import StaffDashboard from './StaffDashboard';
 
 function App() {
-  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'dashboard', 'menu'
+  const [currentView, setCurrentView] = useState('landing'); // 'landing', 'dashboard', 'menu', 'admin-add-menu'
   const [menuItems, setMenuItems] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ name: '', description: '', price: '', category: '' });
 
   // Fetch all menu items from Spring Boot Backend
   const fetchMenu = async () => {
+    alert("Fetching menu...");
     try {
       const response = await fetch('http://localhost:8080/api/menu');
       const data = await response.json();
@@ -20,34 +23,28 @@ function App() {
       console.error("Failed to fetch menu", error);
     }
   };
+  
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/orders');
+      const data = await response.json();
+      setOrders(data);
+    } catch (error) {
+      console.error("Failed to fetch orders", error);
+    }
+  };
 
   useEffect(() => {
-    if (currentView === 'dashboard') {
+    if (currentView === 'admin-dashboard') {
       fetchMenu();
+      fetchOrders();
     }
   }, [currentView]);
 
-  // Add a new menu item
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!formData.name || !formData.price) return;
+  const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+  const totalOrdersCount = orders.length;
 
-    try {
-      await fetch('http://localhost:8080/api/menu', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          price: parseFloat(formData.price),
-          available: true
-        })
-      });
-      setFormData({ name: '', description: '', price: '', category: '' });
-      fetchMenu(); // Refresh the list
-    } catch (error) {
-      console.error("Failed to add item", error);
-    }
-  };
+  // Removed handleSubmit from here, moved to AdminMenuAdd component
 
   // Delete an item
   const handleDelete = async (id) => {
@@ -60,68 +57,84 @@ function App() {
   };
 
   if (currentView === 'landing') {
-    return <LandingPage onNavigate={setCurrentView} />;
+    return (
+      <LandingPage 
+        onNavigate={setCurrentView} 
+        onAccessPanel={(panel) => setCurrentView(panel)} 
+      />
+    );
   }
-  
+
   if (currentView === 'menu') {
     return <MenuPage onNavigate={setCurrentView} />;
   }
 
-  return (
-    <div className="app-container">
-      <header className="hero-header">
-        <button className="back-btn" onClick={() => setCurrentView('landing')}>
-          &larr; Back to Home
-        </button>
-        <h1>A&D</h1>
-        <p>Premium Dashboard</p>
-      </header>
+  if (currentView === 'staff-dashboard') {
+    return <StaffDashboard onNavigate={setCurrentView} />;
+  }
+  if (currentView === 'admin-menu-add') {
+    return <AdminMenuAdd onNavigate={setCurrentView} onRefresh={fetchMenu} />;
+  }
 
-      <main className="dashboard">
-        <section className="form-section glass-panel">
-          <h2>Add New Dish</h2>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Dish Name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-            <input
-              type="number"
-              placeholder="Price ($)"
-              step="0.01"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              required
-            />
-            <select
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              <option value="">Select Category</option>
-              <option value="Starters">Starters</option>
-              <option value="Mains">Mains</option>
-              <option value="Desserts">Desserts</option>
-              <option value="Beverages">Beverages</option>
-            </select>
-            <button type="submit" className="primary-btn">Add to Menu</button>
-          </form>
+  if (currentView === 'admin-dashboard') {
+    return (
+      <div className="app-container">
+        <header className="hero-header">
+          <div className="header-nav">
+            <button className="back-home-btn" onClick={() => setCurrentView('landing')}>
+              &larr; Exit to Home
+            </button>
+            <h1>A2C Admin</h1>
+            <button className="add-link-btn" onClick={() => setCurrentView('admin-menu-add')}>
+              + Add New Dish
+            </button>
+          </div>
+          <p>Manage Your Culinary Portfolio</p>
+        </header>
+
+        <section className="stats-grid">
+          <div className="stat-card glass-panel">
+            <span className="stat-icon">💰</span>
+            <div className="stat-info">
+              <h3>Total Revenue</h3>
+              <p className="stat-value">${totalRevenue.toFixed(2)}</p>
+            </div>
+          </div>
+          <div className="stat-card glass-panel">
+            <span className="stat-icon">🧾</span>
+            <div className="stat-info">
+              <h3>Total Orders</h3>
+              <p className="stat-value">{totalOrdersCount}</p>
+            </div>
+          </div>
+          <div className="stat-card glass-panel">
+            <span className="stat-icon">🍴</span>
+            <div className="stat-info">
+              <h3>Menu Items</h3>
+              <p className="stat-value">{menuItems.length}</p>
+            </div>
+          </div>
+          <div className="stat-card glass-panel">
+            <span className="stat-icon">📊</span>
+            <div className="stat-info">
+              <h3>Avg Order</h3>
+              <p className="stat-value">${totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount).toFixed(2) : '0.00'}</p>
+            </div>
+          </div>
         </section>
-
-        <section className="menu-list glass-panel">
-          <h2>Current Menu</h2>
+      <main className="dashboard-content">
+        <section className="menu-list-full glass-panel">
+          <div className="list-header">
+            <h2>Current Menu Items</h2>
+            <span className="count-badge">{menuItems.length} Items</span>
+          </div>
           {loading ? (
-            <div className="loader">Loading delicacies...</div>
+            <div className="loader">Synchronizing with kitchen...</div>
           ) : menuItems.length === 0 ? (
-            <p className="empty-state">No items yet. Start adding some!</p>
+            <div className="empty-state">
+              <p>Your menu is currently empty.</p>
+              <button className="primary-btn" onClick={() => setCurrentView('admin-menu-add')}>Create Your First Dish</button>
+            </div>
           ) : (
             <div className="grid">
               {menuItems.map((item) => (
@@ -143,6 +156,9 @@ function App() {
       </main>
     </div>
   );
+  }
+
+  return null; // Fallback
 }
 
 export default App;

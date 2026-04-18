@@ -1,0 +1,130 @@
+.admin-add-container {
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  padding: 2rem;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.admin-nav-btns {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  gap: 1rem;
+}
+
+.admin-header .back-btn, .back-home-btn-small {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-light);
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.admin-header .back-btn:hover, .back-home-btn-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  color: white;
+}
+
+.admin-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.admin-main {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-section {
+  padding: 3rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+textarea {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.5);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  resize: vertical;
+  transition: border-color 0.3s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.input-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  background: var(--accent);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+}
+
+.submit-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.3);
+}
+
+@media (max-width: 768px) {
+  .admin-header .back-btn {
+    position: static;
+    margin-bottom: 2rem;
+    display: inline-block;
+  }
+  
+  .input-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-section {
+    padding: 2rem;
+  }
+}

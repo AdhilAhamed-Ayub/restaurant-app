@@ -157,6 +157,37 @@ function MenuPage({ onNavigate }) {
         )}
       </main>
 
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <div className="logo footer-logo">🍔 <span>A&D</span></div>
+            <p>Exceptional Food, Unforgettable Experience.</p>
+          </div>
+          <div className="footer-links">
+            <div className="link-column">
+              <h4>Quick Links</h4>
+              <button className="link-button" onClick={() => onNavigate('landing')}>Home</button>
+              <button className="link-button" onClick={() => { onNavigate('landing'); setTimeout(() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' }), 100); }}>About</button>
+            </div>
+            <div className="link-column">
+              <h4>Contact</h4>
+              <p>📍 123 Culinary Drive</p>
+              <p>📞 (555) 123-4567</p>
+              <p>✉️ hello@adrestaurant.com</p>
+            </div>
+            <div className="link-column">
+              <h4>Hours</h4>
+              <p>Mon-Fri: 11am - 10pm</p>
+              <p>Sat-Sun: 9am - 11pm</p>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>&copy; 2026 A&D Restaurant. All rights reserved.</p>
+        </div>
+      </footer>
+
       {/* Cart Drawer */}
       <div className={`cart-drawer-overlay ${isCartOpen ? 'open' : ''}`} onClick={() => setIsCartOpen(false)}></div>
       <aside className={`cart-drawer ${isCartOpen ? 'open' : ''}`}>

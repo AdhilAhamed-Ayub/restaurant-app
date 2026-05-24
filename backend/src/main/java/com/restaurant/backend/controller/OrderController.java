@@ -9,7 +9,9 @@ import com.restaurant.backend.repository.MenuItemRepository;
 import com.restaurant.backend.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class OrderController {
         Order order = new Order();
         order.setOrderType(orderRequest.getOrderType() != null ? orderRequest.getOrderType() : "DINE_IN");
         order.setTableNumber(orderRequest.getTableNumber());
-        order.setStatus("PREPARING");
+        order.setStatus("ORDERED");
         
         double totalAmount = 0.0;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -61,12 +63,23 @@ public class OrderController {
 
     // Get all orders (for Staff/Admin Dashboard)
     @GetMapping
+    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
     }
 
+    // Get order by ID
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
+    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // Update order status
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasRole('STAFF') or hasRole('ADMIN')")
     public ResponseEntity<Order> updateStatus(@PathVariable Long id, @RequestParam String status) {
         Optional<Order> orderOpt = orderRepository.findById(id);
         if (orderOpt.isPresent()) {
@@ -77,3 +90,4 @@ public class OrderController {
         return ResponseEntity.notFound().build();
     }
 }
+

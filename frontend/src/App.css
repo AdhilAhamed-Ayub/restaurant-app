@@ -356,3 +356,171 @@ button {
     gap: 1.5rem;
   }
 }
+
+.admin-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logout-btn {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  padding: 0.6rem 1.2rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.portal-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.logout-btn-minimal {
+  background: transparent;
+  color: #ef4444;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+
+.logout-btn-minimal:hover {
+  text-decoration: underline;
+}
+
+
+/* Recent Orders Admin section */
+.orders-summary-section {
+  margin-bottom: 3rem;
+}
+
+.orders-mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.order-mini-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.order-mini-card.clickable {
+  cursor: pointer;
+}
+
+.order-mini-card.clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  transform: translateX(5px);
+}
+
+.mini-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mini-id {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.mini-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mini-details {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.mini-total {
+  font-weight: 700;
+  color: #10b981;
+}
+
+.view-all-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+}
+
+.view-all-btn:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Nested Admin Layout Styles */
+.admin-layout-content {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.admin-content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.content-header h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.nav-link-btn {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.nav-link-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.welcome-msg {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: -2rem;
+  margin-bottom: 2rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+

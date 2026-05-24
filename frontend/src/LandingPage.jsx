@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 
-function LandingPage({ onNavigate }) {
+function LandingPage() {
+  const navigate = useNavigate();
   return (
     <div className="landing-container">
       {/* Navbar */}
@@ -11,9 +13,9 @@ function LandingPage({ onNavigate }) {
         </div>
         <div className="nav-links">
           <button className="nav-item" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</button>
-          <button className="nav-item" onClick={() => onNavigate('menu')}>Menu</button>
+          <button className="nav-item" onClick={() => navigate('/menu')}>Menu</button>
           <button className="nav-item" onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}>About</button>
-          <button className="nav-btn admin-btn" onClick={() => onNavigate('admin-dashboard')}>Admin Access</button>
+          <button className="nav-btn admin-btn" onClick={() => navigate('/admin/dashboard')}>Admin Access</button>
         </div>
       </nav>
 
@@ -28,7 +30,7 @@ function LandingPage({ onNavigate }) {
             Where Every Seat is Already Yours
           </p>
           <div className="hero-actions">
-            <button className="cta-btn primary-cta" onClick={() => onNavigate('menu')}>
+            <button className="cta-btn primary-cta" onClick={() => navigate('/menu')}>
               Order Now 🍽️
             </button>
             <button className="cta-btn secondary-cta" onClick={() => alert('Booking coming soon!')}>
@@ -95,7 +97,7 @@ function LandingPage({ onNavigate }) {
             <div className="link-column">
               <h4>Quick Links</h4>
               <button className="link-button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</button>
-              <button className="link-button" onClick={() => onNavigate('menu')}>Menu</button>
+              <button className="link-button" onClick={() => navigate('/menu')}>Menu</button>
               <button className="link-button" onClick={() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' })}>About</button>
             </div>
             <div className="link-column">
@@ -106,9 +108,9 @@ function LandingPage({ onNavigate }) {
             </div>
           <div className="link-column">
               <h4>Internal Panels</h4>
-              <button className="link-button" onClick={() => onNavigate('menu')}>User Order</button>
-              <button className="link-button" onClick={() => onNavigate('staff-dashboard')}>Staff Portal</button>
-              <button className="link-button" onClick={() => onNavigate('admin-dashboard')}>Admin Panel</button>
+              <button className="link-button" onClick={() => navigate('/menu')}>User Order</button>
+              <button className="link-button" onClick={() => navigate('/staff-dashboard')}>Staff Portal</button>
+              <button className="link-button" onClick={() => navigate('/admin/dashboard')}>Admin Panel</button>
             </div>
             <div className="link-column">
               <h4>Hours</h4>

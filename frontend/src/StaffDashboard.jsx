@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import './StaffDashboard.css';
 
-function StaffDashboard({ onNavigate }) {
+function StaffDashboard() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('orders'); // 'orders', 'inventory'
   const [orders, setOrders] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -9,8 +13,11 @@ function StaffDashboard({ onNavigate }) {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/orders');
+      const response = await fetch('http://localhost:8080/api/orders', {
+        headers: { 'Authorization': `Bearer ${user?.token}` }
+      });
       const data = await response.json();
+
       // Sort: Prepairing first, then Served, then Completed (or just by time)
       setOrders(data.sort((a, b) => b.id - a.id));
       setLoading(false);
@@ -21,8 +28,11 @@ function StaffDashboard({ onNavigate }) {
 
   const fetchMenu = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/menu');
+      const response = await fetch('http://localhost:8080/api/menu', {
+        headers: { 'Authorization': `Bearer ${user?.token}` }
+      });
       const data = await response.json();
+
       setMenuItems(data);
     } catch (error) {
       console.error("Failed to fetch menu", error);
@@ -42,9 +52,11 @@ function StaffDashboard({ onNavigate }) {
   const updateStatus = async (id, newStatus) => {
     try {
       await fetch(`http://localhost:8080/api/orders/${id}/status?status=${newStatus}`, {
-        method: 'PATCH'
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${user?.token}` }
       });
       fetchOrders();
+
     } catch (error) {
       console.error("Failed to update status", error);
     }
@@ -52,9 +64,10 @@ function StaffDashboard({ onNavigate }) {
 
   const getStatusColor = (status) => {
     switch (status) {
+      case 'ORDERED': return '#3b82f6';
       case 'PREPARING': return '#FFB800';
-      case 'SERVED': return '#10b981';
-      case 'COMPLETED': return '#3b82f6';
+      case 'READY FOR PICKUP': return '#10b981';
+      case 'COMPLETED': return '#10b981';
       default: return '#808191';
     }
   };
@@ -66,10 +79,14 @@ function StaffDashboard({ onNavigate }) {
       const item = menuItems.find(i => i.id === id);
       await fetch(`http://localhost:8080/api/menu`, {
         method: 'POST', // The current backend uses POST for save/update if ID is present (typical JPA behavior)
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
         body: JSON.stringify({ ...item, available: !currentStatus })
       });
       fetchMenu();
+
     } catch (error) {
       console.error("Failed to toggle availability", error);
     }
@@ -79,17 +96,23 @@ function StaffDashboard({ onNavigate }) {
     <div className="staff-container">
       <header className="staff-header">
         <div className="staff-nav">
-          <button className="back-btn" onClick={() => onNavigate('landing')}>&larr; Exit</button>
+          <button className="back-btn" onClick={() => navigate('/')}>&larr; Exit</button>
           <div className="tab-group">
             <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Orders</button>
             <button className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`} onClick={() => setActiveTab('inventory')}>Inventory</button>
           </div>
           <h1>Staff Portal</h1>
+          <div className="portal-user-info">
+            <span>Welcome, {user?.name}</span>
+            <button className="logout-btn-minimal" onClick={() => { logout(); navigate('/'); }}>Logout</button>
+          </div>
+
           <div className="status-legend">
             {activeTab === 'orders' && (
               <>
+                <span className="dot ordered"></span> New
                 <span className="dot preparing"></span> Prep
-                <span className="dot served"></span> Served
+                <span className="dot ready"></span> Ready
               </>
             )}
           </div>
@@ -123,10 +146,15 @@ function StaffDashboard({ onNavigate }) {
         ) : (
           <div className="orders-grid">
             {orders.map(order => (
-              <div key={order.id} className="order-card glass-panel" style={{borderLeftColor: getStatusColor(order.status)}}>
+              <div 
+                key={order.id} 
+                className="order-card glass-panel clickable" 
+                style={{borderLeftColor: getStatusColor(order.status)}}
+                onClick={() => navigate(`/order-details/${order.id}`)}
+              >
                 <div className="order-header">
                   <span className="order-id">Order #{order.id}</span>
-                  <span className="order-time">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                  <span className="order-time">{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                 </div>
                 
                 <div className="order-info">
@@ -137,27 +165,30 @@ function StaffDashboard({ onNavigate }) {
                 </div>
 
                 <div className="order-items-list">
-                  {order.items.map((item, idx) => (
+                  {order.items.slice(0, 3).map((item, idx) => ( // Show only first 3 items as preview
                     <div key={idx} className="order-item-row">
                       <span className="qty">{item.quantity}x</span>
                       <span className="name">{item.menuItem?.name || 'Unknown Item'}</span>
                     </div>
                   ))}
+                  {order.items.length > 3 && <div className="more-items">+{order.items.length - 3} more items</div>}
                 </div>
 
-                <div className="order-actions">
-                  {order.status === 'PREPARING' && (
-                    <button className="action-btn served-btn" onClick={() => updateStatus(order.id, 'SERVED')}>
-                      Mark as Served
+                <div className="order-actions" onClick={(e) => e.stopPropagation()}>
+                  {order.status === 'ORDERED' && (
+                    <button className="action-btn next-btn" onClick={() => updateStatus(order.id, 'PREPARING')}>
+                      Start Preparing
                     </button>
                   )}
-                  {order.status === 'SERVED' && (
-                    <button className="action-btn complete-btn" onClick={() => updateStatus(order.id, 'COMPLETED')}>
+                  {order.status === 'PREPARING' && (
+                    <button className="action-btn next-btn" onClick={() => updateStatus(order.id, 'READY FOR PICKUP')}>
+                      Ready for Pickup
+                    </button>
+                  )}
+                  {order.status === 'READY FOR PICKUP' && (
+                    <button className="action-btn next-btn" onClick={() => updateStatus(order.id, 'COMPLETED')}>
                       Complete Order
                     </button>
-                  )}
-                  {order.status === 'COMPLETED' && (
-                    <span className="done-label">Finished</span>
                   )}
                 </div>
               </div>

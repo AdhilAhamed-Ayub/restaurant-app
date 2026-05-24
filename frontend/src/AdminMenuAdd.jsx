@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 import './AdminMenuAdd.css';
 
-function AdminMenuAdd({ onNavigate, onRefresh }) {
+function AdminMenuAdd() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({ name: '', description: '', price: '', category: '' });
   const [loading, setLoading] = useState(false);
 
@@ -13,18 +17,22 @@ function AdminMenuAdd({ onNavigate, onRefresh }) {
     try {
       const response = await fetch('http://localhost:8080/api/menu', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
           available: true
         })
       });
+
       
       if (response.ok) {
         setFormData({ name: '', description: '', price: '', category: '' });
         alert("Dish added successfully!");
-        onNavigate('dashboard'); // Redirect back to menu list
+        navigate('/admin-dashboard'); // Redirect back to menu list
       }
     } catch (error) {
       console.error("Failed to add item", error);
@@ -33,20 +41,13 @@ function AdminMenuAdd({ onNavigate, onRefresh }) {
     }
   };
 
+
   return (
-    <div className="admin-add-container">
-      <header className="admin-header">
-        <div className="admin-nav-btns">
-          <button className="back-btn" onClick={() => onNavigate('dashboard')}>
-            &larr; Back to Dashboard
-          </button>
-          <button className="back-home-btn-small" onClick={() => onNavigate('landing')}>
-            Home
-          </button>
-        </div>
-        <h1>Add New Delicacy</h1>
+    <div className="admin-content-inner animate-fade">
+      <div className="content-header">
+        <h2>Add New Delicacy</h2>
         <p>Expand your culinary repertoire</p>
-      </header>
+      </div>
 
       <main className="admin-main">
         <section className="form-section glass-panel">

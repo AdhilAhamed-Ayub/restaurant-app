@@ -44,8 +44,10 @@
   margin-right: 5px;
 }
 
+.dot.ordered { background: #3b82f6; }
 .dot.preparing { background: #FFB800; }
-.dot.served { background: #10b981; }
+.dot.ready { background: #10b981; }
+
 
 .staff-main {
   max-width: 1400px;
@@ -67,6 +69,15 @@
 .order-card:hover {
   transform: translateY(-5px);
 }
+
+.order-card.clickable {
+  cursor: pointer;
+}
+
+.order-card.clickable:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
 
 .order-header {
   display: flex;
@@ -145,6 +156,12 @@
   border: none;
 }
 
+.next-btn {
+  background: var(--primary-orange);
+  color: white;
+  box-shadow: 0 4px 15px rgba(254, 114, 76, 0.2);
+}
+
 .served-btn {
   background: #10b981;
   color: white;
@@ -152,10 +169,11 @@
 }
 
 .complete-btn {
-  background: #3b82f6;
+  background: #10b981;
   color: white;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
 }
+
 
 .action-btn:hover {
   transform: translateY(-2px);

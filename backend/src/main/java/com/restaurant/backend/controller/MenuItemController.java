@@ -4,7 +4,9 @@ import com.restaurant.backend.model.MenuItem;
 import com.restaurant.backend.repository.MenuItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -38,13 +40,17 @@ public class MenuItemController {
 
     // Create a new menu item
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public MenuItem createMenuItem(@RequestBody MenuItem menuItem) {
+
         return menuItemRepository.save(menuItem);
     }
 
     // Update an existing menu item
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('STAFF')") // Staff can toggle availability
     public ResponseEntity<MenuItem> updateMenuItem(@PathVariable Long id, @RequestBody MenuItem menuItemDetails) {
+
         return menuItemRepository.findById(id)
                 .map(existingItem -> {
                     existingItem.setName(menuItemDetails.getName());
@@ -60,7 +66,9 @@ public class MenuItemController {
 
     // Delete a menu item
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> deleteMenuItem(@PathVariable Long id) {
+
         return menuItemRepository.findById(id)
                 .map(existingItem -> {
                     menuItemRepository.delete(existingItem);

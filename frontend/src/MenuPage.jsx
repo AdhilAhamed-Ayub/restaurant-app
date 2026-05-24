@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MenuPage.css';
+import { useAuth } from './AuthContext';
 
-function MenuPage({ onNavigate }) {
+function MenuPage() {
+  const navigate = useNavigate();
+
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
+  const { user, isAuthenticated } = useAuth();
   
   // Cart State
+
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -76,12 +82,22 @@ function MenuPage({ onNavigate }) {
       }))
     };
 
+    if (!isAuthenticated) {
+      alert("Please login to place an order!");
+      navigate('/login');
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:8080/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token}`
+        },
         body: JSON.stringify(orderPayload)
       });
+
 
       if (response.ok) {
         alert("🎉 Order placed successfully! Our chefs are preparing it right away.");
@@ -102,14 +118,14 @@ function MenuPage({ onNavigate }) {
   return (
     <div className="menu-page-container">
       <nav className="menu-navbar">
-        <div className="logo" onClick={() => onNavigate('landing')} style={{cursor: 'pointer'}}>
+        <div className="logo" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
           🍔 <span>A&D</span>
         </div>
         <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
           <button className="cart-floating-btn" onClick={() => setIsCartOpen(true)}>
             🛒 Cart ({totalItemCount})
           </button>
-          <button className="back-btn-menu" onClick={() => onNavigate('landing')}>
+          <button className="back-btn-menu" onClick={() => navigate('/')}>
             &larr; Back
           </button>
         </div>
@@ -167,8 +183,8 @@ function MenuPage({ onNavigate }) {
           <div className="footer-links">
             <div className="link-column">
               <h4>Quick Links</h4>
-              <button className="link-button" onClick={() => onNavigate('landing')}>Home</button>
-              <button className="link-button" onClick={() => { onNavigate('landing'); setTimeout(() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' }), 100); }}>About</button>
+              <button className="link-button" onClick={() => navigate('/')}>Home</button>
+              <button className="link-button" onClick={() => { navigate('/'); setTimeout(() => document.getElementById('about').scrollIntoView({ behavior: 'smooth' }), 100); }}>About</button>
             </div>
             <div className="link-column">
               <h4>Contact</h4>
